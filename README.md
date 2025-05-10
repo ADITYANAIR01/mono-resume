@@ -19,35 +19,40 @@ Mono Resume is a modern, minimalist resume builder designed for tech professiona
 
 ## Table of Contents
 
-- [Mono Resume](#mono-resume)
-  - [Features](#features)
-  - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Technologies Used](#technologies-used)
-  - [Contributing](#contributing)
-  - [License](#license)
-  - [Support](#support)
-  - [Acknowledgements](#acknowledgements)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Technologies Used](#technologies-used)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ## Installation
 
 1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/ADITYANAIR01/mono-resume.git
    ```
-   git clone https://github.com/mono-resume/mono-resume.git
-   ```
+
 2. Navigate to the project directory:
-   ```
+
+   ```bash
    cd mono-resume
    ```
+
 3. Install dependencies:
-   ```
+
+   ```bash
    npm install
    ```
+
 4. Run the development server:
-   ```
+
+   ```bash
    npm run dev
    ```
+
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ## Usage
@@ -76,8 +81,6 @@ We welcome contributions to Mono Resume! Please follow these steps to contribute
 3. Commit your changes: `git commit -m 'Add some AmazingFeature'`
 4. Push to the branch: `git push origin feature/AmazingFeature`
 5. Open a Pull Request
-
-Please read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
 
 ## License
 
