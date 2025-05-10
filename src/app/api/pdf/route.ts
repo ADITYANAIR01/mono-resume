@@ -5,9 +5,7 @@ import Database from "better-sqlite3";
 import PQueue from "p-queue";
 import fs from 'fs';
 import path from 'path';
-
-const BROWSERLESS_URL = process.env.BROWSERLESS_URL!;
-const BROWSERLESS_TOKEN = process.env.BROWSERLESS_TOKEN!;
+import puppeteer from 'puppeteer';
 
 // Initialize the queue
 const queue = new PQueue({ concurrency: 3 });
@@ -38,34 +36,30 @@ const incrementCount = db.prepare(
 );
 const getCount = db.prepare("SELECT count FROM pdf_count WHERE id = 1");
 
-async function generatePDF(html: string): Promise<ArrayBuffer> {
-  const response = await fetch(
-    `${BROWSERLESS_URL}/pdf?token=${BROWSERLESS_TOKEN}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        html,
-        options: {
-          format: "a4",
-          margin: { top: "0px", right: "0px", bottom: "0px", left: "0px" },
-        },
-      }),
-    }
-  );
+async function generatePDF(html: string): Promise<Buffer> {
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(
-      `PDF generation failed: ${response.status} ${response.statusText}`,
-      errorText
-    );
-    throw new Error(
-      `HTTP error! status: ${response.status}, message: ${errorText}`
-    );
+  try {
+    const page = await browser.newPage();
+    
+    // Set content directly from the HTML string
+    await page.setContent(html, {
+      waitUntil: 'networkidle0',
+    });
+
+    const pdf = await page.pdf({
+      format: 'a4',
+      printBackground: true,
+      margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' }
+    });
+
+    return pdf;
+  } finally {
+    await browser.close();
   }
-
-  return response.arrayBuffer();
 }
 
 export async function POST(request: Request) {
@@ -82,7 +76,7 @@ export async function POST(request: Request) {
     const pdf = await queue.add(() => generatePDF(html));
     incrementCount.run();
 
-    return new NextResponse(pdf as BodyInit, {
+    return new NextResponse(pdf, {
       status: 200,
       headers: {
         "Content-Type": "application/pdf",
