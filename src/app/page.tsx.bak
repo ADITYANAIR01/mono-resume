@@ -32,15 +32,34 @@ import { Download, Loader2 } from "lucide-react";
 import { funFacts, FunFact } from "@/app/data/facts";
 import Image from "next/image";
 
-export default function Home() {
-  const [resumeData, setResumeData] = useState<ResumeData | null>(null);
+// Function to get the next midnight timestamp
+const fetchTotalPDFsGenerated = async () => {
+  try {
+    const response = await fetch("/api/pdf", {
+      method: "GET",
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      return data.count;
+    } else {
+      console.error("Failed to fetch PDF count:", data.error);
+      return 0;
+    }
+  } catch (error) {
+    console.error("Error fetching PDF count:", error);
+    return 0;
+  }
+};
+
+export default function Home() {  const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDownloadComplete, setIsDownloadComplete] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [currentFunFact, setCurrentFunFact] = useState<FunFact | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [sectionOrder, setSectionOrder] = useState<string[]>(() => {
+  const [isLoading, setIsLoading] = useState(true);const [sectionOrder, setSectionOrder] = useState<string[]>(() => {
     if (typeof window !== "undefined") {
       const savedOrder = localStorage.getItem("sectionOrder");
       if (savedOrder) {
@@ -81,11 +100,12 @@ export default function Home() {
     importedData: ResumeData,
     importedSectionOrder: string[]
   ) => {
+    // Handle the imported data here
     setResumeData(importedData);
     setSectionOrder(importedSectionOrder);
   };
-
   const generatePDF = async () => {
+
     const activeResumeRef = getActiveResumeRef();
     if (!activeResumeRef.current) return;
 
@@ -93,6 +113,7 @@ export default function Home() {
     setShowDialog(true);
     setCurrentFunFact(getRandomFunFact());
     setIsDownloadComplete(false);
+    console.log("Starting PDF generation");
 
     try {
       const styles = document.getElementsByTagName("style");
@@ -139,6 +160,16 @@ export default function Home() {
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
+
+        const newTotalCount = await fetchTotalPDFsGenerated();
+        setTotalPDFsGenerated(newTotalCount);
+        const newCount = pdfCount + 1;
+        setPdfCount(newCount);
+        setRemainingGenerations(PDF_LIMIT - newCount);
+        localStorage.setItem(
+          "pdfGenerationData",
+          JSON.stringify({ count: newCount, resetTime: nextResetTime })
+        );
         setIsDownloadComplete(true);
       } else {
         console.error("Failed to generate PDF:", await response.text());
@@ -147,14 +178,88 @@ export default function Home() {
       console.error("Error generating PDF:", error);
     } finally {
       setIsDownloading(false);
+      console.log("PDF generation process finished");
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const count = await fetchTotalPDFsGenerated();
+      setTotalPDFsGenerated(count);
+
+      const storedData = localStorage.getItem("pdfGenerationData");
+      if (storedData) {
+        const { count, resetTime } = JSON.parse(storedData);
+        if (Date.now() >= resetTime) {
+          // If it's past reset time, reset the count
+          setPdfCount(0);
+          setNextResetTime(getNextMidnight());
+          localStorage.setItem(
+            "pdfGenerationData",
+            JSON.stringify({ count: 0, resetTime: getNextMidnight() })
+          );
+        } else {
+          setPdfCount(count);
+          setNextResetTime(resetTime);
+        }
+      } else {
+        // If no stored data, initialize with current values
+        localStorage.setItem(
+          "pdfGenerationData",
+          JSON.stringify({ count: 0, resetTime: getNextMidnight() })
+        );
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setIsLoading(false);
+    };
+
+    fetchData();
+
+    // Set up an interval to check and update the countdown every minute
+    const intervalId = setInterval(() => {
+      const now = Date.now();
+      if (now >= nextResetTime) {
+        setPdfCount(0);
+        setNextResetTime(getNextMidnight());
+        localStorage.setItem(
+          "pdfGenerationData",
+          JSON.stringify({ count: 0, resetTime: getNextMidnight() })
+        );
+      }
+      setTimeRemaining(getTimeUntilMidnight());
+    }, 60000);
+
+    return () => clearInterval(intervalId);
+  }, [nextResetTime]);
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    if (cooldownRemaining > 0) {
+      intervalId = setInterval(() => {
+        setCooldownRemaining((prev) => Math.max(prev - 1, 0));
+      }, 1000);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [cooldownRemaining]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.ctrlKey && event.key === "p") {
         event.preventDefault();
-        generatePDF();
+        if (cooldownRemaining > 0) {
+          console.log(
+            `Please wait ${cooldownRemaining} seconds before generating another PDF.`
+          );
+          return;
+        }
+
+        if (pdfCount < PDF_LIMIT) {
+          generatePDF();
+        } else {
+          setShowLimitDialog(true);
+        }
       } else if (event.ctrlKey && event.key === "s") {
         event.preventDefault();
         downloadHTML();
@@ -165,21 +270,21 @@ export default function Home() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+  });
 
   const closeAlertDialog = () => {
     setShowDialog(false);
+
+    // Use setTimeout to delay the state resets until after the dialog has closed
     setTimeout(() => {
       setIsDownloading(false);
       setIsDownloadComplete(false);
       setCurrentFunFact(null);
     }, 0);
+  };
+
+  const closeLimitDialog = () => {
+    setShowLimitDialog(false);
   };
 
   const downloadHTML = async () => {
@@ -328,7 +433,11 @@ export default function Home() {
                           <TooltipTrigger asChild>
                             <Button
                               size="sm"
-                              disabled={!resumeData || isDownloading}
+                              disabled={
+                                !resumeData ||
+                                isDownloading ||
+                                cooldownRemaining > 0
+                              }
                               onClick={generatePDF}
                             >
                               {isDownloading ? (
@@ -336,9 +445,17 @@ export default function Home() {
                               ) : (
                                 <Download className="mr-2 h-4 w-4" />
                               )}
-                              <p className="block lg:hidden">PDF</p>
+                              <p className="block lg:hidden">
+                                {cooldownRemaining > 0
+                                  ? `Wait (${cooldownRemaining}s)`
+                                  : "PDF"}
+                              </p>
                               <p className="hidden lg:block">
-                                {isDownloading ? "Generating..." : "Download PDF"}
+                                {isDownloading
+                                  ? "Generating..."
+                                  : cooldownRemaining > 0
+                                  ? `Wait (${cooldownRemaining}s)`
+                                  : "Download PDF"}
                               </p>
                             </Button>
                           </TooltipTrigger>
@@ -362,6 +479,9 @@ export default function Home() {
                 />
               </div>
 
+              <div className="text-center text-mono_secondary/50 my-2 font-semibold">
+                {totalPDFsGenerated.toLocaleString()} Resumes Generated
+              </div>
               <div className="h-16 w-full m-auto bg-white border-t flex">
                 <div className="flex flex-col items-center w-full">
                   <div className="max-w-screen-md w-full m-auto px-4 2xl:px-0 md:flex items-center justify-between">
@@ -478,7 +598,9 @@ export default function Home() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {isDownloadComplete ? "Download Complete!!" : "Generating Your Resume..."}
+              {isDownloadComplete
+                ? "Download Complete!!"
+                : "Generating Your Resume..."}
             </AlertDialogTitle>
             <AlertDialogDescription />
             <div className="flex flex-col space-y-4 text-left">
@@ -491,6 +613,15 @@ export default function Home() {
               <div className="text-sm text-neutral-700">
                 {isDownloadComplete ? (
                   <div className="flex flex-col gap-4">
+                    <div className="flex md:flex-row flex-col items-center justify-between h-8">
+                      <span className="text-sm text-gray-600">
+                        Remaining PDF generations: {remainingGenerations}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        Resets in: {timeRemaining.hours}h{" "}
+                        {timeRemaining.minutes}m
+                      </span>
+                    </div>
                     <div className="w-full grid md:grid-cols-2 gap-4">
                       <Link
                         href="https://www.buymeacoffee.com/pujan_modha"
@@ -553,6 +684,24 @@ export default function Home() {
                   </div>
                 )}
               </div>
+            </div>
+          </AlertDialogHeader>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={showLimitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>PDF Generation Limit Reached</AlertDialogTitle>
+            <AlertDialogDescription />
+            <div className="flex flex-col space-y-4 text-left">
+              <div className="text-sm text-neutral-700">
+                <p>
+                  You have reached the PDF generation limit. Please try again in{" "}
+                  {timeRemaining.hours} hours and {timeRemaining.minutes}{" "}
+                  minutes.
+                </p>
+              </div>
+              <Button onClick={closeLimitDialog}>Close</Button>
             </div>
           </AlertDialogHeader>
         </AlertDialogContent>

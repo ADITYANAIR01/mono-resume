@@ -5,7 +5,7 @@ import puppeteer from 'puppeteer';
 
 async function generatePDF(html: string): Promise<Buffer> {
   const browser = await puppeteer.launch({
-    headless: 'new',
+    headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 
@@ -23,7 +23,7 @@ async function generatePDF(html: string): Promise<Buffer> {
       margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' }
     });
 
-    return pdf;
+    return Buffer.from(pdf);
   } finally {
     await browser.close();
   }
