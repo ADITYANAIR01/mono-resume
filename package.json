@@ -1,7 +1,7 @@
 {
   "name": "mono-resume",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -47,6 +47,6 @@
     "typescript": "^5.8.3"
   },
   "engines": {
-    "node": "^20"
+    "node": "^21"
   }
 }
