@@ -10,9 +10,8 @@ export const metadata: Metadata = {
   applicationName: "Mono Resume",
   title: "Mono Resume - There's a new builder on the block.",
   description:
-    "Create a standout resume with Mono Resume, a clean and minimalist resume builder. Featuring a unique code-inspired look with monospace fonts, it helps tech professionals showcase their skills in style. Easy to use, customizable, and perfect for making a lasting impression in the digital age.",
-  keywords:
-    "resume, resume builder, minimalist resume, code-inspired resume, monospace fonts, tech resume, digital resume, modern resume, professional resume, mono resume, monoresume, monoresume.com, pujan, pujan modha, pujan.pm",
+    "Create a standout resume with Mono Resume, a clean and minimalist resume builder. Featuring a unique code-inspired look with monospace fonts, it helps tech professionals showcase their skills in style. Easy to use, customizable, and perfect for making a lasting impression in the digital age.",  keywords:
+    "resume, resume builder, minimalist resume, code-inspired resume, monospace fonts, tech resume, digital resume, modern resume, professional resume, mono resume",
   icons: {
     icon: [
       {

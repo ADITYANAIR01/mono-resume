@@ -34,7 +34,7 @@ Mono Resume is a modern, minimalist resume builder designed for tech professiona
 
 1. Clone the repository:
    ```
-   git clone https://github.com/pujan-modha/mono-resume.git
+   git clone https://github.com/mono-resume/mono-resume.git
    ```
 2. Navigate to the project directory:
    ```
@@ -83,19 +83,9 @@ Please read our [Contributing Guidelines](CONTRIBUTING.md) for more details.
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Support
-
-If you find this project helpful, consider buying the developer a coffee:
-
-[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/pujan_modha)
-
 ## Acknowledgements
 
 - [shadcn/ui](https://ui.shadcn.com/) for UI components
 - [Lucide](https://lucide.dev/) for icons
 - [FontAwesome](https://fontawesome.com/) for additional icons
 - [JetBrains Mono](https://www.jetbrains.com/lp/mono/) font for the code-like appearance
-
----
-
-Made with ❤️ by [Pujan Modha](https://github.com/pujan-modha)
