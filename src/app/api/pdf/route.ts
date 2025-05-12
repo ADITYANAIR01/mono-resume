@@ -5,7 +5,7 @@ import puppeteer from 'puppeteer';
 
 async function generatePDF(html: string): Promise<Buffer> {
   const browser = await puppeteer.launch({
-    headless: 'new',
+    headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
 
@@ -17,11 +17,14 @@ async function generatePDF(html: string): Promise<Buffer> {
       waitUntil: 'networkidle0',
     });
 
-    const pdf = await page.pdf({
+    const pdfUint8Array = await page.pdf({
       format: 'a4',
       printBackground: true,
       margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' }
     });
+
+    // Convert Uint8Array to Buffer
+    const pdf = Buffer.from(pdfUint8Array);
 
     return pdf;
   } finally {
