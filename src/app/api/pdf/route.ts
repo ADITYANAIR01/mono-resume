@@ -17,10 +17,29 @@ async function generatePDF(html: string): Promise<Buffer> {
       waitUntil: 'networkidle0',
     });
 
+    // Calculate the height of the content
+    const height = await page.evaluate(() => {
+      // Remove any unnecessary elements that might have display: none
+      document.querySelectorAll('[style*="display: none"]').forEach(el => el.remove());
+      
+      // Get the full height of the content
+      const body = document.body;
+      const html = document.documentElement;
+      
+      return Math.max(
+        body.scrollHeight, body.offsetHeight,
+        html.clientHeight, html.scrollHeight, html.offsetHeight
+      );
+    });
+
+    // Generate PDF with custom page size
     const pdfUint8Array = await page.pdf({
-      format: 'a4',
+      width: '8.27in', // A4 width
+      height: `${height}px`,
       printBackground: true,
-      margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' }
+      margin: { top: '10px', right: '10px', bottom: '10px', left: '10px' },
+      scale: 0.95,
+      preferCSSPageSize: false // Disable CSS page size to use our custom dimensions
     });
 
     // Convert Uint8Array to Buffer
