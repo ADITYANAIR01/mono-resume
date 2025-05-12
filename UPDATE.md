@@ -26,11 +26,13 @@ This guide outlines the steps to update an existing npm package in the npm publi
      ```bash
      npm version patch
      ```
+
    - For new, backward-compatible features (e.g., `1.0.0` to `1.1.0`):
 
      ```bash
      npm version minor
      ```
+
    - For breaking changes (e.g., `1.0.0` to `2.0.0`):
 
      ```bash
