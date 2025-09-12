@@ -60,7 +60,7 @@ export default function Contact({ data }: ContactProps) {
             <li key={id}>
               <span className="font-semibold text-mono_primary">
                 {contact!.ContactIcon === "microsoft" ? (
-                  <span style={{ display: "inline-block", width: "1", height: "1", verticalAlign: "middle" }}>
+                  <span style={{ display: "inline-block", width: "16px", height: "17px", verticalAlign: "middle" }}>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="100%" height="100%">
                       <rect x="2" y="2" width="20" height="20" fill="currentColor"/>
                       <rect x="26" y="2" width="20" height="20" fill="currentColor"/>
