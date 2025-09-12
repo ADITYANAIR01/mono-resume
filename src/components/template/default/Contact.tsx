@@ -16,15 +16,6 @@ interface ContactProps {
   data: ResumeData;
 }
 
-const contactOrder = [
-  "github",
-  "gitlab",
-  "linkedin",
-  "x-twitter",
-  "email",
-  "phone",
-  "microsoft",
-];
 export default function Contact({ data }: ContactProps) {
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -47,11 +38,10 @@ export default function Contact({ data }: ContactProps) {
     }
   };
 
-  const sortedContactData = contactOrder
-    .map((icon) =>
-      data.ContactData.find((contact) => contact.ContactIcon === icon)
-    )
-    .filter((contact) => contact && contact.isEnabled);
+  // Use the order stored in data.ContactData directly. Only include enabled contacts.
+  const sortedContactData = data.ContactData.filter(
+    (contact) => contact.isEnabled
+  );
   return (
     <>
       <section className="bg-mono_background">

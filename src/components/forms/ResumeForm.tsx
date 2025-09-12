@@ -26,6 +26,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
     removeSubItem,
     handleSubmit,
     setData,
+    moveItem,
   } = useResumeForm(onSubmit);
 
   const handleVisibilityChange = (
@@ -98,6 +99,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({
           handleSubmit={handleSubmit}
           handleVisibilityChange={handleVisibilityChange}
           moveSection={moveSection}
+          moveItem={moveItem}
           sectionOrder={sectionOrder}
           onImport={handleImport} // Pass the new handleImport function
           onReset={handleReset}

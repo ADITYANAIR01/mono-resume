@@ -93,6 +93,7 @@ export default function ContactSection({
   const getContactIndex = (icon: string) =>
     data.ContactData.findIndex((c: any) => c.ContactIcon === icon);
 
+  // We render in the master contactTypes order so user can enable/disable easily
   return (
     <div className="space-y-4">
       {contactTypes.map((contactType) => {
@@ -114,8 +115,9 @@ export default function ContactSection({
         const contactIndex = getContactIndex(contactType.icon);
 
         return (
-          <div key={contactType.icon} className="space-y-2">
-            <div className="flex items-center space-x-2">
+          <div key={contactType.icon} className="space-y-2 border-b pb-3 last:border-none">
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center space-x-2">
               <Checkbox
                 id={`contact-enabled-${contactType.icon}`}
                 checked={contactData.isEnabled}
@@ -144,34 +146,53 @@ export default function ContactSection({
                     contactType.label
                   )}
               </Label>
-              {/* Add up/down buttons for ordering */}
-              {contactData.isEnabled && moveItem && (
-                <div className="flex flex-col ml-2">
+              </div>
+              {/* Four directional arrows (up/down/left/right) positioned to right */}
+              {contactData.isEnabled && moveItem && contactIndex !== -1 && (
+                <div className="grid grid-cols-3 gap-1 w-20 select-none">
+                  <div />
                   <button
                     type="button"
                     aria-label="Move up"
-                    className="text-xs px-1 py-0.5 border rounded disabled:opacity-50"
+                    className="text-[10px] px-1 py-0.5 border rounded disabled:opacity-30"
                     disabled={contactIndex <= 0}
                     onClick={() =>
                       moveItem("ContactData", contactIndex, contactIndex - 1)
                     }
-                  >
-                    ▲
-                  </button>
+                  >▲</button>
+                  <div />
                   <button
                     type="button"
-                    aria-label="Move down"
-                    className="text-xs px-1 py-0.5 border rounded disabled:opacity-50"
-                    disabled={
-                      contactIndex === -1 ||
-                      contactIndex >= data.ContactData.length - 1
+                    aria-label="Move left"
+                    className="text-[10px] px-1 py-0.5 border rounded disabled:opacity-30"
+                    disabled={contactIndex <= 0}
+                    onClick={() =>
+                      moveItem("ContactData", contactIndex, contactIndex - 1)
                     }
+                  >◀</button>
+                  <div className="flex items-center justify-center text-[10px] font-semibold">
+                    {contactIndex + 1}
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Move right"
+                    className="text-[10px] px-1 py-0.5 border rounded disabled:opacity-30"
+                    disabled={contactIndex >= data.ContactData.length - 1}
                     onClick={() =>
                       moveItem("ContactData", contactIndex, contactIndex + 1)
                     }
-                  >
-                    ▼
-                  </button>
+                  >▶</button>
+                  <div />
+                  <button
+                    type="button"
+                    aria-label="Move down"
+                    className="text-[10px] px-1 py-0.5 border rounded disabled:opacity-30"
+                    disabled={contactIndex >= data.ContactData.length - 1}
+                    onClick={() =>
+                      moveItem("ContactData", contactIndex, contactIndex + 1)
+                    }
+                  >▼</button>
+                  <div />
                 </div>
               )}
             </div>

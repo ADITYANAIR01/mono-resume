@@ -57,6 +57,7 @@ interface ResumeFormLayoutProps {
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   handleVisibilityChange: (section: keyof ResumeData["ResumeConfig"]) => void;
   moveSection: (section: string, direction: "up" | "down") => void;
+  moveItem?: (section: string, fromIndex: number, toIndex: number) => void;
   sectionOrder: string[];
   onImport: (importedData: ResumeData, importedSectionOrder: string[]) => void;
   onReset: () => void;
@@ -72,6 +73,7 @@ const ResumeFormLayout: React.FC<ResumeFormLayoutProps> = ({
   handleSubmit,
   handleVisibilityChange,
   moveSection,
+  moveItem,
   sectionOrder,
   onImport,
   onReset,
@@ -243,6 +245,7 @@ const ResumeFormLayout: React.FC<ResumeFormLayoutProps> = ({
             handleChange={handleChange}
             addItem={addItem}
             removeItem={removeItem}
+            moveItem={moveItem}
           />
         </div>
 

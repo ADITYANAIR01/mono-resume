@@ -219,6 +219,33 @@ const useResumeForm = (onSubmit: (data: ResumeData) => void) => {
     });
   };
 
+  // Generic moveItem for explicit from/to indices (used for ContactData ordering)
+  const moveItem = (
+    section: string,
+    fromIndex: number,
+    toIndex: number
+  ) => {
+    if (fromIndex === -1 || toIndex === -1) return; // invalid indices
+    setData((prevData: ResumeData) => {
+      const newData = { ...prevData };
+      const arr = [
+        ...(newData[section as keyof ResumeData] as Record<string, unknown>[]),
+      ];
+      if (
+        fromIndex < 0 ||
+        fromIndex >= arr.length ||
+        toIndex < 0 ||
+        toIndex >= arr.length
+      ) {
+        return prevData; // out of bounds
+      }
+      const [moved] = arr.splice(fromIndex, 1);
+      arr.splice(toIndex, 0, moved);
+      (newData as any)[section] = arr;
+      return newData;
+    });
+  };
+
   return {
     data,
     handleChange,
@@ -229,6 +256,7 @@ const useResumeForm = (onSubmit: (data: ResumeData) => void) => {
     handleSubmit,
     setData,
     moveSection,
+    moveItem,
   };
 };
 

@@ -1,15 +1,31 @@
-# How to Update an npm Package in the npm Registry
+# Update Log
+
+## Version 1.2.5 - Minor Improvements
+
+### Changes
+
+- **Microsoft Contact Support**: Added support for Microsoft Learn contact information.
+
+- **Contact Reordering**: Introduced up, down, left, and right arrow controls for reordering contact information dynamically.
+
+- **Version Update**: Incremented version to 1.2.5 to reflect these minor improvements.
+
+---
+
+For more details, refer to the updated documentation or contact section implementation.
+
+## How to Update an npm Package in the npm Registry
 
 This guide outlines the steps to update an existing npm package in the npm public registry after making changes to your local codebase.
 
-## Prerequisites
+### Prerequisites
 
 - An npm account with a published package in the npm registry.
 - **Node.js** and **npm** installed locally.
 - Your package's source code in a local repository (optionally with Git).
 - Valid npm account credentials.
 
-## Steps to Update Your npm Package
+### Steps to Update Your npm Package
 
 1. **Test Your Changes**\
    Ensure all code changes, bug fixes, or new features are complete and tested. Run your test suite to verify functionality:

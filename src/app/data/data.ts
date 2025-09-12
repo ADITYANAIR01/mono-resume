@@ -70,6 +70,12 @@ export const dummyData: ResumeData = {
       ContactText: "+919876543210",
       isEnabled: true,
     },
+    {
+      ContactIcon: "microsoft",
+      ContactLink: "https://learn.microsoft.com/en-us/users/example",
+      ContactText: "learn.microsoft.com/en-us/users/example",
+      isEnabled: true,
+    },
   ],
   EducationData: [
     {

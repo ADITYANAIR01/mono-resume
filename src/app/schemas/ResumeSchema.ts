@@ -7,6 +7,7 @@ const ContactIconEnum = z.enum([
   "phone",
   "gitlab",
   "x-twitter",
+  "microsoft",
 ]);
 
 export const ResumeSchema = z.object({
