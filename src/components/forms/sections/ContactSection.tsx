@@ -2,12 +2,14 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import Image from "next/image";
 
 interface ContactSectionProps {
   data: any;
   handleChange: any;
   addItem: (section: string) => void;
   removeItem: (section: string, index: number) => void;
+  moveItem?: (section: string, fromIndex: number, toIndex: number) => void; // Added for ordering
 }
 
 const contactTypes = [
@@ -17,11 +19,13 @@ const contactTypes = [
   { icon: "x-twitter", label: "Twitter", baseUrl: "https://x.com/" },
   { icon: "email", label: "Email", baseUrl: "mailto:" },
   { icon: "phone", label: "Phone", baseUrl: "tel:" },
+  { icon: "microsoft", label: "Microsoft Learn", baseUrl: "https://learn.microsoft.com/en-us/users/" },
 ];
 
 export default function ContactSection({
   data,
   handleChange,
+  moveItem, // Added for ordering
 }: ContactSectionProps) {
   const handleContactLinkChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -85,6 +89,10 @@ export default function ContactSection({
     handleChange(e, "ContactData", contactType, "ContactText");
   };
 
+  // Helper to get the index of a contact type in ContactData
+  const getContactIndex = (icon: string) =>
+    data.ContactData.findIndex((c: any) => c.ContactIcon === icon);
+
   return (
     <div className="space-y-4">
       {contactTypes.map((contactType) => {
@@ -102,6 +110,9 @@ export default function ContactSection({
           ""
         );
 
+        // Find the index of this contact in the current ContactData array
+        const contactIndex = getContactIndex(contactType.icon);
+
         return (
           <div key={contactType.icon} className="space-y-2">
             <div className="flex items-center space-x-2">
@@ -118,8 +129,51 @@ export default function ContactSection({
                 }
               />
               <Label htmlFor={`contact-enabled-${contactType.icon}`}>
-                {contactType.label}
+                  {contactType.icon === "microsoft" ? (
+                    <span style={{ display: "inline-flex", alignItems: "center" }}>
+                      <Image 
+                        src="/microsoft-logo.svg" 
+                        alt="Microsoft Logo" 
+                        width={20} 
+                        height={20} 
+                        style={{ marginRight: 6, display: "inline-block", verticalAlign: "middle" }} 
+                      />
+                      {contactType.label}
+                    </span>
+                  ) : (
+                    contactType.label
+                  )}
               </Label>
+              {/* Add up/down buttons for ordering */}
+              {contactData.isEnabled && moveItem && (
+                <div className="flex flex-col ml-2">
+                  <button
+                    type="button"
+                    aria-label="Move up"
+                    className="text-xs px-1 py-0.5 border rounded disabled:opacity-50"
+                    disabled={contactIndex <= 0}
+                    onClick={() =>
+                      moveItem("ContactData", contactIndex, contactIndex - 1)
+                    }
+                  >
+                    ▲
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Move down"
+                    className="text-xs px-1 py-0.5 border rounded disabled:opacity-50"
+                    disabled={
+                      contactIndex === -1 ||
+                      contactIndex >= data.ContactData.length - 1
+                    }
+                    onClick={() =>
+                      moveItem("ContactData", contactIndex, contactIndex + 1)
+                    }
+                  >
+                    ▼
+                  </button>
+                </div>
+              )}
             </div>
             {contactData.isEnabled && (
               <div className="grid lg:grid-cols-2 gap-2 xl:gap-4">
@@ -129,6 +183,8 @@ export default function ContactSection({
                       ? "Email Address"
                       : contactType.icon === "phone"
                       ? "Phone Number"
+                      : contactType.icon === "microsoft"
+                      ? "Microsoft Learn Username"
                       : "Username"}
                   </Label>
                   <Input
@@ -143,6 +199,8 @@ export default function ContactSection({
                         ? "address"
                         : contactType.icon === "phone"
                         ? "number"
+                        : contactType.icon === "microsoft"
+                        ? "username"
                         : "username"
                     }`}
                   />

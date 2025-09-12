@@ -23,6 +23,7 @@ const contactOrder = [
   "x-twitter",
   "email",
   "phone",
+  "microsoft",
 ];
 export default function Contact({ data }: ContactProps) {
   const getIcon = (iconName: string) => {
@@ -39,6 +40,8 @@ export default function Contact({ data }: ContactProps) {
         return faSquareEnvelope;
       case "phone":
         return faSquarePhone;
+      case "microsoft":
+        return "microsoft";
       default:
         return null;
     }
@@ -56,15 +59,33 @@ export default function Contact({ data }: ContactProps) {
           {sortedContactData.map((contact, id) => (
             <li key={id}>
               <span className="font-semibold text-mono_primary">
-                <FontAwesomeIcon
-                  icon={getIcon(contact!.ContactIcon) as IconProp}
-                  size="lg"
-                />
+                {contact!.ContactIcon === "microsoft" ? (
+                  <span style={{ display: "inline-block", width: "1", height: "1", verticalAlign: "middle" }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="100%" height="100%">
+                      <rect x="2" y="2" width="20" height="20" fill="currentColor"/>
+                      <rect x="26" y="2" width="20" height="20" fill="currentColor"/>
+                      <rect x="2" y="26" width="20" height="20" fill="currentColor"/>
+                      <rect x="26" y="26" width="20" height="20" fill="currentColor"/>
+                    </svg>
+                  </span>
+                ) : (
+                  <FontAwesomeIcon
+                    icon={getIcon(contact!.ContactIcon) as IconProp}
+                    size="lg"
+                  />
+                )}
                 <span className="-tracking-widest select-none"> </span>
               </span>
               <a href={contact!.ContactLink} target="_noref">
                 <span className="hover:text-mono_primary text-mono_secondary hover:underline">
-                  {contact!.ContactText}
+                  {contact!.ContactIcon === "microsoft"
+                    ? (() => {
+                        // Extract username from the ContactLink (last segment after last slash)
+                        const link = contact!.ContactLink || "";
+                        const username = link.split("/").filter(Boolean).pop() || contact!.ContactText;
+                        return username;
+                      })()
+                    : contact!.ContactText}
                   {!data.ResumeConfig.ResumeHasPDFPreview && (
                     <span className="text-mono_primary opacity-50 print:hidden inline-flex align-middle">
                       <svg

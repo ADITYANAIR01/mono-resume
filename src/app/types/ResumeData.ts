@@ -40,7 +40,8 @@ export interface ResumeData {
       | "linkedin"
       | "github"
       | "gitlab"
-      | "x-twitter";
+      | "x-twitter"
+      | "microsoft";
     ContactLink?: string;
     ContactText?: string;
     isEnabled: boolean;
